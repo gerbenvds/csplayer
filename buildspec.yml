@@ -1,0 +1,42 @@
+version: 0.2
+
+env:
+  variables:
+    CHROME_RPM_URL: "https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm"
+    PYTHON_VERSIONS: "3.8 3.9"
+
+phases:
+  install:
+    commands:
+      - sudo yum install -y yum-utils rpmdevtools python-pip3
+  build:
+    commands:
+      - curl -O "$CHROME_RPM_URL"
+      - yum install -y google-chrome-stable_current_x86_64.rpm libxcb
+      - rpmdev-extract google-chrome-stable_current_x86_64.rpm
+      - mkdir -p /target/lib
+      - mv google-chrome-stable-*/opt/google /target
+      - ./ldd-copy-dependencies.sh -b /target/google/chrome/chrome -t /target/lib
+      - CHROME_MAJ_VER=$(/target/google/chrome/chrome --version | awk '{ print $3 }' | awk -F. '{ print $1 }')
+      - CHROME_DRIVER_VER=$(curl -sf "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAJ_VER")
+      - curl -O "https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VER/chromedriver_linux64.zip"
+      - unzip chromedriver_linux64.zip -d /target/bin/
+      - cp /bin/gzip -d /target/bin/
+      - ./ldd-copy-dependencies.sh -b /target/bin/gzip -t /target/lib
+      - ./ldd-copy-dependencies.sh -b /target/bin/chromedriver -t /target/lib
+      - gzexe /target/bin/chromedriver /target/google/chrome/chrome
+      - rm /target/bin/chromedriver~ /target/google/chrome/chrome~
+      - >
+        for version in $PYTHON_VERSIONS; do
+          pip3 install --platform manylinux2014_aarch64 --target=/target/python/lib/python$version/site-packages --implementation cp --python $version --only-binary=:all: --requirement requirements.txt
+        done
+
+      - cd /target
+      - zip -r9 /csp-layer.zip *
+  post_build:
+    commands: aws lambda publish-layer-version --layer-name csp-layer --description "test $(date '+%FT%T')" --zip-file fileb:///csp-layer.zip --compatible-runtimes python3.8,python3.9
+
+artifacts:
+  files:
+    - '/csp-layer.zip'
+  name: csp-layer-$(date +%Y%m%d).zip
