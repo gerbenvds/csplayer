@@ -21,11 +21,11 @@ phases:
       - CHROME_DRIVER_VER=$(curl -sf "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAJ_VER")
       - curl -O "https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VER/chromedriver_linux64.zip"
       - unzip chromedriver_linux64.zip -d /target/bin/
-      - cp /bin/gzip -d /target/bin/
-      - ./ldd-copy-dependencies.sh -b /target/bin/gzip -t /target/lib
+        #      - cp /bin/gzip -d /target/bin/
+        #      - ./ldd-copy-dependencies.sh -b /target/bin/gzip -t /target/lib
       - ./ldd-copy-dependencies.sh -b /target/bin/chromedriver -t /target/lib
-      - gzexe /target/bin/chromedriver /target/google/chrome/chrome
-      - rm /target/bin/chromedriver~ /target/google/chrome/chrome~
+        #      - gzexe /target/bin/chromedriver /target/google/chrome/chrome
+        #      - rm /target/bin/chromedriver~ /target/google/chrome/chrome~
       - >
         for version in $PYTHON_VERSIONS; do
           pip3 install --platform manylinux2014_aarch64 --target=/target/python/lib/python$version/site-packages --implementation cp --python $version --only-binary=:all: --requirement requirements.txt
