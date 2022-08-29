@@ -34,9 +34,6 @@ phases:
       - cd /target
       - zip -r9 /csp-layer.zip *
   post_build:
-    commands: aws lambda publish-layer-version --layer-name csp-layer --description "test $(date '+%FT%T')" --zip-file fileb:///csp-layer.zip --compatible-runtimes python3.8,python3.9
-
-artifacts:
-  files:
-    - '/csp-layer.zip'
-  name: csp-layer-$(date +%Y%m%d).zip
+    commands: 
+      - aws s3 cp /csp-layer.zip s3://141135812894-layerstorage/csp-layer.zip
+      - aws lambda publish-layer-version --layer-name csp-layer --description "test $(date '+%FT%T')" --content S3Bucket=141135812894-layerstorage,S3Key=csp-layer.zip --compatible-runtimes python3.8,python3.9
