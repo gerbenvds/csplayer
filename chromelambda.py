@@ -30,7 +30,7 @@ def __import__():
     for arg in ARGUMENTS:
         chrome_options.add_argument(arg)
     global chrome
-    chrome = webdriver.Chrome("/opt/bin/chromedriver", options=chrome_options)
+    chrome = webdriver.Chrome("/opt/bin/chromedriver", options=chrome_options, service_args=['--enable-chrome-logs'])
 
 def getDriver():
     return chrome
