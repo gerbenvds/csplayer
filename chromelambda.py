@@ -41,6 +41,7 @@ def __init():
         shutil.copytree('/opt/google/chrome','/tmp/chrome')
     if not os.path.exists('/tmp/chrome/chrome'):
         __unzip('/tmp/chrome/chrome.gz','/tmp/chrome/chrome')
+        os.chmod("/tmp/chrome/chrome", 755)
 
 def __unzip(source, target):
     with gzip.open(source, 'rb') as f_in:
