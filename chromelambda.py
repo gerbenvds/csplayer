@@ -16,7 +16,7 @@ ARGUMENTS = [
         '--single-process',
         'window-size=2560x1440',
         '--user-data-dir=/tmp/chrome-user-data',
-        '--remote-debugging-port=9222'
+#        '--remote-debugging-port=9222'
 ]
 
 

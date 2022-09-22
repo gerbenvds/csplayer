@@ -25,6 +25,7 @@ phases:
       - unzip chromedriver_linux64.zip -d /target/bin/
       - ./ldd-copy-dependencies.sh -b /target/bin/chromedriver -t /target/lib
       - gzip /target/google/chrome/chrome
+      - cp $(which gzip) /target/bin/
       - >
         for version in $PYTHON_VERSIONS; do
           pip3 install --platform manylinux2014_aarch64 --target=/target/python/lib/python$version/site-packages --implementation cp --python $version --only-binary=:all: --requirement requirements.txt
