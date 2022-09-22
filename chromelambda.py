@@ -1,11 +1,10 @@
 import gzip
 import shutil
+import os
 
 
 from selenium import webdriver
 from selenium_stealth import stealth
-
-chrome = None
 
 ARGUMENTS = [
         '--headless',
@@ -23,11 +22,14 @@ ARGUMENTS = [
 
 
 def __import__():
+    if 'chrome' in globals():
+        return
     __init()
     chrome_options = webdriver.ChromeOptions()
     chrome_options.binary_location = "/tmp/chrome/chrome"
     for arg in ARGUMENTS:
         chrome_options.add_argument(arg)
+    global chrome
     chrome = webdriver.Chrome("/opt/bin/chromedriver", options=chrome_options)
 
 def getDriver():
@@ -35,8 +37,10 @@ def getDriver():
 
 
 def __init():
-    shutil.copytree('/opt/google/chrome','/tmp/chrome')
-    __unzip('/tmp/chrome/chrome.gz','/tmp/chrome/chrome')
+    if not os.path.isdir('/tmp/chrome'):
+        shutil.copytree('/opt/google/chrome','/tmp/chrome')
+    if not os.path.exists('/tmp/chrome/chrome'):
+        __unzip('/tmp/chrome/chrome.gz','/tmp/chrome/chrome')
 
 def __unzip(source, target):
     with gzip.open(source, 'rb') as f_in:
